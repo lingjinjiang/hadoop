@@ -21,6 +21,7 @@ package org.apache.hadoop.yarn.server.resourcemanager.metrics;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -187,6 +188,14 @@ public class TimelineServiceV1Publisher extends AbstractSystemMetricsPublisher {
     tEvent.setTimestamp(updatedTime);
     tEvent.setEventInfo(eventInfo);
     entity.addEvent(tEvent);
+    String latestApplicationAttemptId = app.getCurrentAppAttempt() == null
+        ? null : app.getCurrentAppAttempt().getAppAttemptId().toString();
+    if (latestApplicationAttemptId != null) {
+      Map<String, Object> entityInfo = new HashMap<String, Object>();
+      entityInfo.put(ApplicationMetricsConstants.LATEST_APP_ATTEMPT_EVENT_INFO,
+          latestApplicationAttemptId);
+      entity.setOtherInfo(entityInfo);
+    }
     getDispatcher().getEventHandler().handle(new TimelineV1PublishEvent(
         SystemMetricsEventType.PUBLISH_ENTITY, entity, app.getApplicationId()));
   }

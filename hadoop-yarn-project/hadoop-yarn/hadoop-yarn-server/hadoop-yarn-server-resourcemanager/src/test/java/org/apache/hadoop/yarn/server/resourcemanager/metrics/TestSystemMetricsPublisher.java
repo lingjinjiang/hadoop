@@ -236,6 +236,10 @@ public class TestSystemMetricsPublisher {
             Long.parseLong(entity.getOtherInfo()
                 .get(ApplicationMetricsConstants.APP_CPU_PREEMPT_METRICS)
                 .toString()));
+        Assert.assertEquals(
+            app.getCurrentAppAttempt().getAppAttemptId().toString(),
+            entity.getOtherInfo().get(
+                ApplicationMetricsConstants.LATEST_APP_ATTEMPT_EVENT_INFO));
       }
       Assert.assertEquals("context", entity.getOtherInfo()
           .get(ApplicationMetricsConstants.YARN_APP_CALLER_CONTEXT));

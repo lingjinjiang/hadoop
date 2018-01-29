@@ -293,6 +293,34 @@ public class TestApplicationHistoryManagerOnTimelineStore {
   }
 
   @Test
+  public void testGetApplicationReportWithRunningState() throws Exception {
+    final ApplicationId appId = ApplicationId.newInstance(1234, 1);
+    ApplicationReport app;
+    if (callerUGI == null) {
+      app = historyManager.getApplication(appId);
+    } else {
+      app =
+          callerUGI.doAs(new PrivilegedExceptionAction<ApplicationReport> () {
+            @Override
+            public ApplicationReport run() throws Exception {
+              return historyManager.getApplication(appId);
+            }
+          });
+    }
+    Assert.assertNotNull(app);
+    Assert.assertEquals(appId, app.getApplicationId());
+    if (callerUGI != null &&
+        (callerUGI.getShortUserName().equals("user2") ||
+            callerUGI.getShortUserName().equals("user3"))) {
+      Assert.assertEquals(ApplicationAttemptId.newInstance(appId, -1),
+          app.getCurrentApplicationAttemptId());
+    } else {
+      Assert.assertEquals(ApplicationAttemptId.newInstance(appId, 1),
+          app.getCurrentApplicationAttemptId());
+    }
+  }
+
+  @Test
   public void testGetApplicationAttemptReport() throws Exception {
     final ApplicationAttemptId appAttemptId =
         ApplicationAttemptId.newInstance(ApplicationId.newInstance(0, 1), 1);
@@ -545,6 +573,10 @@ public class TestApplicationHistoryManagerOnTimelineStore {
     } else {
       entityInfo.put(ApplicationMetricsConstants.APP_VIEW_ACLS_ENTITY_INFO,
           "user2");
+    }
+    if (!noAttemptId) {
+      entityInfo.put(ApplicationMetricsConstants.LATEST_APP_ATTEMPT_EVENT_INFO,
+          ApplicationAttemptId.newInstance(appId, 1).toString());
     }
     Set<String> appTags = new HashSet<String>();
     appTags.add("Test_APP_TAGS_1");

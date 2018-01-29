@@ -366,6 +366,13 @@ public class ApplicationHistoryManagerOnTimelineStore extends AbstractService
           }
         }
       }
+      if (entityInfo.containsKey(
+          ApplicationMetricsConstants.LATEST_APP_ATTEMPT_EVENT_INFO)) {
+        latestApplicationAttemptId = ApplicationAttemptId.fromString(
+            entityInfo.get(
+                ApplicationMetricsConstants.LATEST_APP_ATTEMPT_EVENT_INFO)
+                .toString());
+      }
     }
     List<TimelineEvent> events = entity.getEvents();
     long updatedTimeStamp = 0L;
